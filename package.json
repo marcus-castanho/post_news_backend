@@ -1,0 +1,16 @@
+{
+  "name": "post_news",
+  "version": "1.0.0",
+  "description": "A backend application using vanilla NodeJS for a webserver",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Marcus Castanho",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
