@@ -1,4 +1,4 @@
-//require no model (usecase?)
+//require no useCase
 
 const  postNews = (req,res) => {
     if(req.method !== 'POST'){

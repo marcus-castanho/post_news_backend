@@ -1,4 +1,4 @@
-//require no model (usecase?)
+//require no useCase
 
 const  updateNews = (req,res) => {
     if(req.method !== 'PUT'){
