@@ -6,7 +6,9 @@ const  searchNews = (req,res) => {
         res.end();
     }
 
-    findNews();
+    const searchStr = '';
+
+    findNews(searchStr);
     
     return
 }

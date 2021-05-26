@@ -1,9 +1,9 @@
-const {connectDB} = require('../../db/db.js')
+const { connectDB } = require('../../db/db.js')
 
-const findNews =  (searchStr) => {
-    connectDB();
-    
-    return 
+const findNews = async (searchStr) => {
+    const dbConnection = await connectDB();
+
+    return
 }
 
 module.exports = {
