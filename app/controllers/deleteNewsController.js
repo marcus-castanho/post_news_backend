@@ -1,11 +1,11 @@
-//require no useCase
 
 const  deleteNews = (req,res) => {
     if(req.method !== 'DELETE'){
         res.writeHead(405,{'Contet-type':'text/plain'});   
         res.end();
     }
-    else return
+    
+    return
 }
 
 module.exports = {
