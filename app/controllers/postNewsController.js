@@ -12,7 +12,7 @@ const postNews = (req, res) => {
     data += chunk;
   });
 
-  req.on('end', () => {
+  req.on('end', async () => {
     const newsBody = JSON.parse(data);
 
     if (Object.keys(newsBody).toString() !== ['title', 'content', 'category'].toString()) {
@@ -31,12 +31,23 @@ const postNews = (req, res) => {
       }
     }
 
-    createNews(newsBody);
+    for (property in newsBody) {
+      newsBody[property] = newsBody[property].toLowerCase().trim();
+    }
+
+    const createdNews = await createNews(newsBody);
+
+    if (createdNews == undefined) {
+      res.writeHead(503, { 'Contet-type': 'text/plain' });
+      res.write('We are going through some technical issues, please try again later.');
+      res.end();
+      return
+    }
 
     res.writeHead(200, { 'Contet-type': 'text/plain' });
+    res.write(`${JSON.stringify(createdNews)}`);
     res.end();
   });
-
 }
 
 module.exports = {

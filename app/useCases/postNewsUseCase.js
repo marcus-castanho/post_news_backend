@@ -1,20 +1,29 @@
 const { connectDB } = require('../../db/db.js')
 
 const createNews = async (newsBody) => {
-    const dbConnection = await connectDB();
-    const insertValuesQuery = "INSERT INTO category (category) VALUES (?) ON DUPLICATE KEY UPDATE category = ?; SELECT * FROM category as c WHERE c.category = ?; INSERT INTO news (title, content, category_id) VALUES(?,?, (SELECT category_id FROM category WHERE category = ?));";
-
     let { title, content, category } = newsBody;
+    let createdNews;
 
-    title = title.toLowerCase().trim();
-    content = content.toLowerCase().trim();
-    category = category.toLowerCase().trim();
+    const insertCategory = 'SET @category = ?; INSERT INTO category (category) VALUES (@category) ON DUPLICATE KEY UPDATE category = @category';
+    const getCategoryId = 'SELECT category_id FROM category WHERE category = ?';
+    const insertNews = 'INSERT INTO news (title, content, category_id) VALUES(?,?,?)';
+    const getCreatedNews = 'SELECT * from news FULL JOIN category WHERE news_id = (SELECT LAST_INSERT_ID());';
 
-    dbConnection.query(insertValuesQuery, [category, category, category, title, content, category], (err, results, fields) => {
-        if (err) throw err;
-    });
+    try{
+        const dbConnection = await connectDB();
 
-    return
+        await dbConnection.query(insertCategory, [category]);
+        const category_id = (await dbConnection.query(getCategoryId, [category]))[0][0].category_id;
+        await dbConnection.query(insertNews, [title, content, category_id]);
+        const [rows] = await dbConnection.query(getCreatedNews);
+
+        createdNews = rows[0];
+    }
+    catch(err){
+        console.log(err);
+    }
+
+    return createdNews;
 }
 
 module.exports = {
