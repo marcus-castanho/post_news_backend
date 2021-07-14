@@ -2,8 +2,8 @@ const { createNews } = require('../useCases/postNewsUseCase');
 
 const postNews = (req, res) => {
   if (req.method !== 'POST') {
-    res.writeHead(405, { 'Contet-type': 'text/plain' });
-    res.end();
+    serverResponse(res, 405, 'bad_method');
+    return
   }
 
   let data = '';
@@ -16,38 +16,44 @@ const postNews = (req, res) => {
     const newsBody = JSON.parse(data);
 
     if (Object.keys(newsBody).toString() !== ['title', 'content', 'category'].toString()) {
-      res.writeHead(400, { 'Contet-type': 'text/plain' });
-      res.write('Malformed request body.');
-      res.end();
+      serverResponse(res, 400, 'bad_req_body')
       return
     }
 
     for (let field in newsBody) {
       if ((/^\s*$/).test(newsBody[field])) {
-        res.writeHead(400, { 'Contet-type': 'text/plain' });
-        res.write('Empty fields are not allowed.');
-        res.end();
+        serverResponse(res, 400, 'empty_input')
         return
       }
-    }
-
-    for (property in newsBody) {
-      newsBody[property] = newsBody[property].toLowerCase().trim();
+      newsBody[field] = newsBody[field].toLowerCase().trim();
     }
 
     const createdNews = await createNews(newsBody);
 
     if (createdNews == undefined) {
-      res.writeHead(503, { 'Contet-type': 'text/plain' });
-      res.write('We are going through some technical issues, please try again later.');
-      res.end();
+      serverResponse(res, 503, 'db_error');
       return
     }
 
-    res.writeHead(200, { 'Contet-type': 'text/plain' });
-    res.write(`${JSON.stringify(createdNews)}`);
-    res.end();
+    serverResponse(res, 200, 'success', createdNews);
   });
+}
+
+const serverResponse = (res, statusCode, resultCase, dbRes = '') => {
+  let message;
+  res.writeHead(statusCode, { 'Contet-type': 'text/plain' });
+
+  switch (resultCase) {
+      case 'bad_req_body': message = 'Malformed request body.';
+          break;
+      case 'empty_input': message = 'Empty fields are not allowed.';
+          break;
+      case 'db_error': message = 'We are going through some technical issues, please try again later.';
+          break
+      case 'success': message = `${JSON.stringify(dbRes)}`
+  }
+  res.write(message);
+  res.end();
 }
 
 module.exports = {
