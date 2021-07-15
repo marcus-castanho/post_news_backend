@@ -24,7 +24,8 @@ const connectDB = async () => {
             user: 'root',
             password: '123456',
             database: 'mysql',
-            multipleStatements: true
+            multipleStatements: true,
+            charset: 'utf8_unicode_ci'
         });
 
         global.connection = dbConnection;

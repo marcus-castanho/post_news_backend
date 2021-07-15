@@ -1,3 +1,5 @@
+const { getNews } = require('../useCases/searchNewsUseCase')
+
 const searchNews = (req, res) => {
     if (req.method !== 'GET') {
         serverResponse(res, 405, 'bad_method')
@@ -30,7 +32,14 @@ const searchNews = (req, res) => {
 
         newsBody['search_input'] = newsBody['search_input'].toLowerCase().trim();
 
-        serverResponse(res, 200, 'success', 'searchedNews')
+        const searchedNews = await getNews(newsBody);
+
+        if (searchedNews == undefined) {
+            serverResponse(res, 503, 'db_error')
+            return
+        }
+
+        serverResponse(res, 200, 'success', searchedNews)
     });
 }
 
