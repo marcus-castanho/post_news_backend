@@ -2,7 +2,7 @@ const { connectDB } = require('../../db/db.js')
 
 const putNews = async (newsBody) => {
     let { news_id, title, content, category } = newsBody;
-    let updatedNews;
+    let updatedNews = 'fail';
 
     const getCurrentNews = 'SET @news_id = ?; SELECT n.*, c.category from news n JOIN category c WHERE n.news_id = @news_id AND c.category_id = (SELECT n.category_id from news n WHERE n.news_id = @news_id);';
     const getNumOfUsesCategory = 'SET @category_id = ?; SELECT n.news_id, c.* FROM news n JOIN category c WHERE n.category_id = @category_id AND c.category_id = @category_id;';
@@ -16,6 +16,7 @@ const putNews = async (newsBody) => {
         const dbConnection = await connectDB();
 
         const currNewsObj = (await dbConnection.query(getCurrentNews, [news_id]))[0][1][0];
+        if(currNewsObj == undefined) updatedNews = 'news_not_found';
 
         if (currNewsObj.category !== category) {
             const numUsesCategory = (await dbConnection.query(getNumOfUsesCategory, [currNewsObj.category_id]))[0][1];

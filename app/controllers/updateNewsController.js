@@ -33,7 +33,12 @@ const updateNews = (req, res) => {
 
         const updatedNews = await putNews(newsBody);
 
-        if (updatedNews == undefined) {
+        if (updatedNews == 'news_not_found') {
+            serverResponse(res, 404, 'data_not_found', updatedNews);
+            return
+        }
+
+        if (updatedNews == 'fail') {
             serverResponse(res, 503, 'db_error');
             return
         }
@@ -52,7 +57,9 @@ const serverResponse = (res, statusCode, resultCase, dbRes = '') => {
         case 'empty_input': message = 'Empty fields are not allowed.';
             break;
         case 'db_error': message = 'We are going through some technical issues, please try again later.';
-            break
+            break;
+        case 'data_not_found': message = 'Data not found.';
+            break;
         case 'success': message = `${JSON.stringify(dbRes)}`
     }
     res.write(message);
