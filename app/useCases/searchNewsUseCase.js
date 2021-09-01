@@ -4,7 +4,6 @@ const getNews = async (newsBody) => {
     let { search_input } = newsBody;
     let searchedNews;
 
-    //string query select todas as colunas news join com category WHERE coluna1 LIKE input OR coluna2 LIKE input ...
     const searchPattern = '%' + search_input + '%';
     const getNewsLikeInput = 'SET @pattern = ?; SELECT n.*, c.category from news n JOIN category c WHERE n.title LIKE @pattern OR n.content LIKE @pattern OR c.category LIKE @pattern;';
 
